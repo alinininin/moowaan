@@ -631,13 +631,49 @@ input[readonly]{background:var(--bg3);color:var(--text2)}
   </div>
 </div>
 
+<!-- EDIT SALE MODAL -->
+<div id="modal-edit-sale" class="overlay hidden">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">แก้ไขรายการขาย</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:1rem;padding:8px 12px;background:var(--bg3);border-radius:8px" id="es-info"></div>
+    <input type="hidden" id="es-id">
+    <div class="form-group"><label>สินค้า</label><input type="text" id="es-product" readonly style="background:var(--bg3)"></div>
+    <div class="form-row-3">
+      <div class="form-group"><label>ราคา (บาท)</label><input type="number" id="es-price" min="0" oninput="calcEditSaleTotal()"></div>
+      <div class="form-group"><label>ต่อ</label><input type="number" id="es-per" min="1" oninput="calcEditSaleTotal()"></div>
+      <div class="form-group"><label>หน่วย</label><input type="text" id="es-unit" list="unit-opts-all"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>จำนวน</label><input type="number" id="es-qty" min="1" oninput="calcEditSaleTotal()"></div>
+      <div class="form-group"><label>ยอดรวม (บาท)</label><input type="number" id="es-total" readonly style="font-weight:600;color:var(--green)"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>ช่องทาง</label><select id="es-channel"><option>หน้าร้าน</option><option>ออนไลน์</option><option>ตลาด</option><option>อื่นๆ</option></select></div>
+      <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="es-cname" placeholder="-"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>เบอร์โทรลูกค้า</label><input type="text" id="es-cphone" placeholder="-"></div>
+      <div class="form-group"><label>หมายเหตุ</label><input type="text" id="es-note" placeholder="-"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-edit-sale')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveEditSale()"><i class="ti ti-check"></i> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT BILL MODAL -->
 <div id="modal-editbill" class="overlay hidden">
-  <div class="modal">
-    <div class="modal-title">แก้ไขข้อมูลลูกค้า</div>
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">แก้ไขบิล</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:1rem;padding:8px 12px;background:var(--bg3);border-radius:8px" id="eb-bill-no"></div>
     <input type="hidden" id="eb-id">
-    <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="eb-cname" placeholder="เช่น คุณสมชาย"></div>
-    <div class="form-group"><label>เบอร์โทร</label><input type="text" id="eb-cphone" placeholder="เช่น 089-xxx-xxxx"></div>
+    <div class="form-row">
+      <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="eb-cname" placeholder="เช่น คุณสมชาย"></div>
+      <div class="form-group"><label>เบอร์โทร</label><input type="text" id="eb-cphone" placeholder="เช่น 089-xxx-xxxx"></div>
+    </div>
+    <div class="form-group"><label>ช่องทาง</label><select id="eb-channel"><option>หน้าร้าน</option><option>ออนไลน์</option><option>ตลาด</option><option>อื่นๆ</option></select></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="eb-note" placeholder="-"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-editbill')">ยกเลิก</button>
       <button class="btn btn-primary" onclick="saveEditBill()"><i class="ti ti-check"></i> บันทึก</button>
@@ -1063,18 +1099,45 @@ async function addSale(){
 async function addSaleAndPrint(){const d=await addSale();if(d)showReceipt(d.id);}
 function confirmDel(fn,msg='ลบรายการนี้'){if(confirm(msg+'?'))fn();}
 async function delSale(id){await SB.from('sales').delete().eq('id',id);await loadAll();renderSales();}
-async function editSale(id){
+function editSale(id){
   const s=cache.sales.find(x=>x.id===id);if(!s)return;
-  const newQty=prompt('แก้ไขจำนวน (เดิม: '+s.qty+')',s.qty);
-  if(newQty===null)return;
-  const newPrice=prompt('แก้ไขราคา (เดิม: '+s.price+')',s.price);
-  if(newPrice===null)return;
-  const qty=parseFloat(newQty)||s.qty;
-  const price=parseFloat(newPrice)||s.price;
+  document.getElementById('es-id').value=id;
+  document.getElementById('es-info').textContent='#'+String(id).padStart(4,'0')+' — '+fmtDate(s.created_at);
+  document.getElementById('es-product').value=s.product_name;
+  document.getElementById('es-price').value=s.price;
+  document.getElementById('es-per').value=s.price_per||1;
+  document.getElementById('es-unit').value=s.unit||'';
+  document.getElementById('es-qty').value=s.qty;
+  document.getElementById('es-total').value=s.total;
+  document.getElementById('es-channel').value=s.channel||'หน้าร้าน';
+  document.getElementById('es-cname').value=s.customer_name||'';
+  document.getElementById('es-cphone').value=s.customer_phone||'';
+  document.getElementById('es-note').value=s.note||'';
+  refreshUnitDataLists();
+  openModal('modal-edit-sale');
+}
+function calcEditSaleTotal(){
+  const qty=parseFloat(document.getElementById('es-qty').value)||0;
+  const price=parseFloat(document.getElementById('es-price').value)||0;
+  document.getElementById('es-total').value=Math.round(price*qty);
+}
+async function saveEditSale(){
+  const id=parseInt(document.getElementById('es-id').value);
+  const qty=parseFloat(document.getElementById('es-qty').value)||0;
+  const price=parseFloat(document.getElementById('es-price').value)||0;
+  const per=parseFloat(document.getElementById('es-per').value)||1;
+  const unit=document.getElementById('es-unit').value;
   const total=Math.round(price*qty);
+  if(qty<=0||price<=0)return alert('กรุณาระบุจำนวนและราคา');
   setSync('saving','กำลังบันทึก...');
-  await SB.from('sales').update({qty,price,total}).eq('id',id);
-  await loadAll();renderSales();
+  await SB.from('sales').update({
+    qty,price,price_per:per,unit,total,
+    channel:document.getElementById('es-channel').value,
+    customer_name:document.getElementById('es-cname').value.trim()||null,
+    customer_phone:document.getElementById('es-cphone').value.trim()||null,
+    note:document.getElementById('es-note').value.trim()||null,
+  }).eq('id',id);
+  await loadAll();closeModal('modal-edit-sale');renderSales();
 }
 
 // ===== CUSTOMERS =====
@@ -1270,8 +1333,27 @@ function renderBills(){
       <button class="btn btn-sm btn-danger" onclick="confirmDel(()=>delSale(${s.id}),'ลบบิลนี้')"><i class="ti ti-trash"></i></button>
     </td></tr>`).join(''):emptyRow(8);
 }
-function editBill(id){const s=cache.sales.find(x=>x.id===id);if(!s)return;document.getElementById('eb-id').value=id;document.getElementById('eb-cname').value=s.customer_name||'';document.getElementById('eb-cphone').value=s.customer_phone||'';document.getElementById('eb-bill-no').textContent='#'+String(id).padStart(4,'0')+' — '+s.product_name;openModal('modal-editbill');}
-async function saveEditBill(){const id=document.getElementById('eb-id').value;await SB.from('sales').update({customer_name:document.getElementById('eb-cname').value.trim()||null,customer_phone:document.getElementById('eb-cphone').value.trim()||null}).eq('id',id);await loadAll();closeModal('modal-editbill');renderBills();}
+function editBill(id){
+  const s=cache.sales.find(x=>x.id===id);if(!s)return;
+  document.getElementById('eb-id').value=id;
+  document.getElementById('eb-bill-no').textContent='#'+String(id).padStart(4,'0')+' — '+s.product_name+' '+fmt(s.total);
+  document.getElementById('eb-cname').value=s.customer_name||'';
+  document.getElementById('eb-cphone').value=s.customer_phone||'';
+  document.getElementById('eb-channel').value=s.channel||'หน้าร้าน';
+  document.getElementById('eb-note').value=s.note||'';
+  openModal('modal-editbill');
+}
+async function saveEditBill(){
+  const id=document.getElementById('eb-id').value;
+  setSync('saving','กำลังบันทึก...');
+  await SB.from('sales').update({
+    customer_name:document.getElementById('eb-cname').value.trim()||null,
+    customer_phone:document.getElementById('eb-cphone').value.trim()||null,
+    channel:document.getElementById('eb-channel').value,
+    note:document.getElementById('eb-note').value.trim()||null,
+  }).eq('id',id);
+  await loadAll();closeModal('modal-editbill');renderBills();
+}
 
 // ===== INCOME =====
 function renderIncome(){
