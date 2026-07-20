@@ -272,30 +272,26 @@ input[readonly]{background:var(--bg3);color:var(--text2)}
             <div class="form-group"><label>สินค้า</label><select id="s-product" onchange="onProductChange()"><option value="">-- เลือกสินค้า --</option></select></div>
             <div class="form-group"><label>ช่องทาง</label><select id="s-channel"><option>หน้าร้าน</option><option>ออนไลน์</option><option>ตลาด</option><option>อื่นๆ</option></select></div>
           </div>
-          <!-- ราคา + จำนวน + หน่วย ลิงก์กัน -->
+          <!-- ราคา + จำนวน + หน่วย -->
           <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:12px">
             <div style="font-size:12px;margin-bottom:10px">
               <span id="s-price-tier" style="color:var(--coral);font-weight:500"></span>
             </div>
-            <div class="form-row-3">
+            <div class="form-row">
               <div class="form-group" style="margin-bottom:0">
                 <label>ราคา (บาท)</label>
                 <input type="number" id="s-price" placeholder="0" oninput="calcTotal()" min="0">
               </div>
               <div class="form-group" style="margin-bottom:0">
-                <label>ต่อ <span style="font-size:11px;color:var(--text3)">(ใส่ 1 = ราคาต่อชิ้น)</span></label>
-                <input type="number" id="s-price-per" placeholder="1" oninput="calcTotal()" min="1" style="text-align:center">
-              </div>
-              <div class="form-group" style="margin-bottom:0">
                 <label>หน่วย</label>
-                <input type="text" id="s-unit" placeholder="กรัม" style="text-align:center" list="sale-unit-opts" onchange="saveCustomUnit(this.value)">
+                <input type="text" id="s-unit" placeholder="เลือกหรือพิมพ์หน่วย" list="sale-unit-opts" onchange="saveCustomUnit(this.value)">
                 <datalist id="sale-unit-opts"></datalist>
               </div>
             </div>
             <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
               <div class="form-group" style="margin-bottom:0;flex:1">
                 <label>จำนวนที่ขาย</label>
-                <input type="number" id="s-qty" placeholder="เช่น 500" min="1" oninput="calcTotal()">
+                <input type="number" id="s-qty" placeholder="เช่น 5" min="1" oninput="calcTotal()">
               </div>
               <div style="font-size:18px;color:var(--text3);padding-top:22px">=</div>
               <div class="form-group" style="margin-bottom:0;flex:1">
@@ -305,6 +301,8 @@ input[readonly]{background:var(--bg3);color:var(--text2)}
             </div>
             <div id="s-formula" style="font-size:12px;color:var(--text3);margin-top:6px;text-align:right"></div>
           </div>
+          <!-- hidden ต่อ field สำหรับ compatibility -->
+          <input type="hidden" id="s-price-per" value="1">
           <div class="form-row">
             <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="s-cname" placeholder="เช่น คุณสมชาย"></div>
             <div class="form-group"><label>เบอร์โทร</label><input type="text" id="s-cphone" placeholder="เช่น 089-xxx-xxxx"></div>
@@ -543,33 +541,19 @@ input[readonly]{background:var(--bg3);color:var(--text2)}
     <div class="modal-title" id="pm-title">เพิ่มสินค้า</div>
     <div class="form-group"><label>ชื่อสินค้า</label><input type="text" id="pm-name" placeholder="เช่น หมูหวานธรรมดา"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>ราคาปกติ (บาท)</label>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input type="number" id="pm-price" placeholder="0" min="0" style="flex:1">
-          <span style="font-size:13px;color:var(--text2);white-space:nowrap">ต่อ</span>
-          <input type="number" id="pm-price-per" placeholder="100" min="1" style="width:70px">
-          <span id="pm-price-unit-label" style="font-size:13px;color:var(--text2);white-space:nowrap">กรัม</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>ต้นทุน (บาท)</label>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input type="number" id="pm-cost" placeholder="0" min="0" style="flex:1">
-          <span style="font-size:13px;color:var(--text2);white-space:nowrap">ต่อ</span>
-          <input type="number" id="pm-cost-per" placeholder="100" min="1" style="width:70px">
-          <span id="pm-cost-unit-label" style="font-size:13px;color:var(--text2);white-space:nowrap">กรัม</span>
-        </div>
-      </div>
+      <div class="form-group"><label>ราคาปกติ (บาท)</label><input type="number" id="pm-price" placeholder="0" min="0"></div>
+      <div class="form-group"><label>ต้นทุน (บาท)</label><input type="number" id="pm-cost" placeholder="0" min="0"></div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>หน่วย</label>
-        <input type="text" id="pm-unit" placeholder="กรัม" list="unit-opts-all" onchange="saveCustomUnit(this.value);updateUnitLabels()">
+        <input type="text" id="pm-unit" placeholder="เลือกหรือพิมพ์หน่วย" list="unit-opts-all" onchange="saveCustomUnit(this.value)">
         <datalist id="unit-opts-all"></datalist>
       </div>
       <div class="form-group"><label>อีโมจิ</label><input type="text" id="pm-emoji" placeholder="🍖" maxlength="2"></div>
     </div>
+    <input type="hidden" id="pm-price-per" value="1">
+    <input type="hidden" id="pm-cost-per" value="1">
     <input type="hidden" id="pm-id">
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-product')">ยกเลิก</button>
@@ -640,13 +624,11 @@ input[readonly]{background:var(--bg3);color:var(--text2)}
     <div class="form-group"><label>สินค้า</label><input type="text" id="es-product" readonly style="background:var(--bg3)"></div>
     <div class="form-row-3">
       <div class="form-group"><label>ราคา (บาท)</label><input type="number" id="es-price" min="0" oninput="calcEditSaleTotal()"></div>
-      <div class="form-group"><label>ต่อ</label><input type="number" id="es-per" min="1" oninput="calcEditSaleTotal()"></div>
-      <div class="form-group"><label>หน่วย</label><input type="text" id="es-unit" list="unit-opts-all"></div>
-    </div>
-    <div class="form-row">
+      <div class="form-group"><label>หน่วย</label><input type="text" id="es-unit" list="unit-opts-all" onchange="saveCustomUnit(this.value)"></div>
       <div class="form-group"><label>จำนวน</label><input type="number" id="es-qty" min="1" oninput="calcEditSaleTotal()"></div>
-      <div class="form-group"><label>ยอดรวม (บาท)</label><input type="number" id="es-total" readonly style="font-weight:600;color:var(--green)"></div>
     </div>
+    <div class="form-group"><label>ยอดรวม (บาท)</label><input type="number" id="es-total" readonly style="font-weight:600;color:var(--green)"></div>
+    <input type="hidden" id="es-per" value="1">
     <div class="form-row">
       <div class="form-group"><label>ช่องทาง</label><select id="es-channel"><option>หน้าร้าน</option><option>ออนไลน์</option><option>ตลาด</option><option>อื่นๆ</option></select></div>
       <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="es-cname" placeholder="-"></div>
@@ -1035,36 +1017,30 @@ function onProductChange(){
   const c=cache.customers.find(x=>x.id==cid);
   const tier=document.getElementById('s-price-tier');
   const custPrice=cid?cache.customerPrices.find(cp=>cp.customer_id==cid&&cp.product_id==p.id):null;
-  let price,per,unit,tierText='';
+  let price,unit='',tierText='';
   if(custPrice){
     price=custPrice.price;
-    per=custPrice.price_per||p.price_per||1;
-    unit=custPrice.unit||p.unit;
+    unit=custPrice.unit||p.unit||'';
     tierText=`🎯 ราคาพิเศษเฉพาะ ${c?.name||'ลูกค้า'} (แก้ได้)`;
   } else {
     price=p.price;
-    per=p.price_per||1;
-    unit=p.unit;
+    unit=p.unit||'';
     tierText=c?'💰 ราคาปกติของสินค้า (แก้ได้)':'';
   }
   document.getElementById('s-price').value=price;
-  document.getElementById('s-price-per').value=per;
-  document.getElementById('s-unit').value=unit||getLastUnit();
+  document.getElementById('s-unit').value=unit;
   tier.textContent=tierText;
   calcTotal();
 }
 function calcTotal(){
   const qty=parseFloat(document.getElementById('s-qty').value)||0;
   const price=parseFloat(document.getElementById('s-price').value)||0;
-  const per=parseFloat(document.getElementById('s-price-per').value)||1;
-  const unit=document.getElementById('s-unit').value||'หน่วย';
+  const unit=document.getElementById('s-unit').value||'';
   const total=Math.round(price*qty);
   document.getElementById('s-total').value=total;
   const fml=document.getElementById('s-formula');
   if(fml&&qty>0&&price>0){
-    fml.textContent=per>1
-      ? `${price} บาท (ต่อ ${per}${unit}) × ${qty} = ${total} บาท`
-      : `${price} บาท × ${qty} = ${total} บาท`;
+    fml.textContent=`${price} บาท × ${qty}${unit?' '+unit:''} = ${total} บาท`;
   } else if(fml){ fml.textContent=''; }
 }
 async function addSale(){
@@ -1162,31 +1138,16 @@ function renderCustomers(){
     const myPrices=cache.customerPrices.filter(cp=>cp.customer_id===c.id);
     const priceRows=cache.products.map(p=>{
       const ep=myPrices.find(cp=>cp.product_id===p.id);
-      const defPrice=ep?ep.price:p.price;
-      const defPer=ep&&ep.price_per?ep.price_per:(p.price_per||1);
-      const defUnit=ep&&ep.unit?ep.unit:p.unit;
-      const defQty=ep&&ep.qty?ep.qty:'';
-      // คำนวณยอดรวม
       const calcAmt=(ep&&ep.qty&&ep.price)?Math.round(ep.price*ep.qty):0;
       return `<tr>
         <td style="font-size:13px;font-weight:500">${p.emoji||'🍖'} ${p.name}</td>
-        <td><input type="number" class="cp-price" data-cid="${c.id}" data-pid="${p.id}" value="${ep?ep.price:''}" placeholder="${p.price}" style="width:75px;text-align:right;font-size:13px;padding:5px 6px" min="0" oninput="calcCustRowTotal('${c.id}','${p.id}')"></td>
+        <td><input type="number" class="cp-price" data-cid="${c.id}" data-pid="${p.id}" value="${ep?ep.price:''}" placeholder="${p.price}" style="width:80px;text-align:right;font-size:13px;padding:5px 6px" min="0" oninput="calcCustRowTotal('${c.id}','${p.id}')"></td>
         <td>
-          <div style="display:flex;align-items:center;gap:3px">
-            <span style="font-size:12px;color:var(--text2);white-space:nowrap">ต่อ</span>
-            <input type="number" class="cp-per" data-cid="${c.id}" data-pid="${p.id}" value="${ep&&ep.price_per?ep.price_per:''}" placeholder="${defPer}" style="width:50px;text-align:center;font-size:13px;padding:5px 3px" min="1" oninput="calcCustRowTotal('${c.id}','${p.id}')">
-            <input type="text" class="cp-unit" data-cid="${c.id}" data-pid="${p.id}" value="${ep&&ep.unit?ep.unit:''}" placeholder="${defUnit}" style="width:55px;font-size:13px;padding:5px 4px" list="uopts-${c.id}" onchange="saveCustomUnit(this.value)">
-            <datalist id="uopts-${c.id}"></datalist>
-          </div>
+          <input type="text" class="cp-unit" data-cid="${c.id}" data-pid="${p.id}" value="${ep&&ep.unit?ep.unit:''}" placeholder="${p.unit||'หน่วย'}" style="width:70px;font-size:13px;padding:5px 6px" list="uopts-${c.id}" onchange="saveCustomUnit(this.value)">
+          <datalist id="uopts-${c.id}"></datalist>
         </td>
-        <td>
-          <div style="display:flex;align-items:center;gap:3px">
-            <input type="number" class="cp-qty" data-cid="${c.id}" data-pid="${p.id}" value="${defQty}" placeholder="จำนวน" style="width:65px;text-align:center;font-size:13px;padding:5px 4px" min="0" oninput="calcCustRowTotal('${c.id}','${p.id}')">
-          </div>
-        </td>
-        <td style="font-size:13px;font-weight:600;color:var(--green);white-space:nowrap" id="cptotal-${c.id}-${p.id}">
-          ${calcAmt>0?fmt(calcAmt):'—'}
-        </td>
+        <td><input type="number" class="cp-qty" data-cid="${c.id}" data-pid="${p.id}" value="${ep&&ep.qty?ep.qty:''}" placeholder="จำนวน" style="width:70px;text-align:center;font-size:13px;padding:5px 4px" min="0" oninput="calcCustRowTotal('${c.id}','${p.id}')"></td>
+        <td style="font-size:13px;font-weight:600;color:var(--green);white-space:nowrap" id="cptotal-${c.id}-${p.id}">${calcAmt>0?fmt(calcAmt):'—'}</td>
       </tr>`;
     }).join('');
     return `<div class="card" style="margin-bottom:1rem">
@@ -1211,7 +1172,7 @@ function renderCustomers(){
         <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">🎯 ราคาพิเศษแต่ละสินค้า <span style="font-weight:400">(ว่าง = ใช้ราคาปกติ)</span></div>
         <div class="table-wrap">
           <table style="font-size:13px">
-            <thead><tr><th>สินค้า</th><th>ราคา (บาท)</th><th>ต่อ / หน่วย</th><th>จำนวน</th><th>รวม</th></tr></thead>
+            <thead><tr><th>สินค้า</th><th>ราคา (บาท)</th><th>หน่วย</th><th>จำนวน</th><th>รวม</th></tr></thead>
             <tbody>${priceRows}</tbody>
           </table>
         </div>
@@ -1457,12 +1418,8 @@ function updateUnitLabels(){
 function openProductModal(){
   document.getElementById('pm-id').value='';
   document.getElementById('pm-title').textContent='เพิ่มสินค้า';
-  ['pm-name','pm-price','pm-cost','pm-emoji'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('pm-price-per').value=1;
-  document.getElementById('pm-cost-per').value=1;
-  document.getElementById('pm-unit').value='กรัม';
+  ['pm-name','pm-price','pm-cost','pm-emoji','pm-unit'].forEach(id=>document.getElementById(id).value='');
   refreshUnitDataLists();
-  updateUnitLabels();
   openModal('modal-product');
 }
 function editProduct(id){
@@ -1471,12 +1428,10 @@ function editProduct(id){
   document.getElementById('pm-title').textContent='แก้ไขสินค้า';
   document.getElementById('pm-name').value=p.name;
   document.getElementById('pm-price').value=p.price;
-  document.getElementById('pm-price-per').value=p.price_per||1;
   document.getElementById('pm-cost').value=p.cost;
-  document.getElementById('pm-cost-per').value=p.cost_per||1;
-  document.getElementById('pm-unit').value=p.unit;
+  document.getElementById('pm-unit').value=p.unit||'';
   document.getElementById('pm-emoji').value=p.emoji||'';
-  updateUnitLabels();
+  refreshUnitDataLists();
   openModal('modal-product');
 }
 async function saveProduct(){
